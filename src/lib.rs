@@ -2,10 +2,12 @@ extern crate minimp3_sys as ffi;
 extern crate slice_deque;
 
 use slice_deque::SliceDeque;
-use std::io::{self, Read};
+use std::io::{self, Read, Seek};
 use std::mem;
+use std::os::raw::{c_int, c_void};
 
 mod error;
+use error::from_mini_error;
 pub use error::Error;
 
 /// Maximum number of samples present in a MP3 frame.
@@ -137,5 +139,118 @@ where
         self.buffer.extend(dat[..read_bytes].iter());
 
         Ok(read_bytes)
+    }
+}
+
+// Need to box this to avoid pointers being invalidated due to movement
+struct SeekDecoderInner<R> {
+    reader: R,
+    mini_ex_io: ffi::mp3dec_io_t,
+    mini_ex_dec: ffi::mp3dec_ex_t,
+}
+
+/// A sample level Seekable MP3 decoder which consumes a reader and produces samples.
+///
+/// Unlike `Decoder` this requires `Seek` + `Read`. Also when possible, depending on the mp3 encoder this will trim of samples that were added as part of the encoding process.
+pub struct SeekDecoder<R>(Box<SeekDecoderInner<R>>);
+
+unsafe extern "C" fn read_cb<R>(buf: *mut c_void, size: usize, user_data: *mut c_void) -> usize
+where
+    R: Read,
+{
+    // Not sure how to safely panic from within callback
+    let reader = &mut *(user_data as *mut R);
+    let buf = std::slice::from_raw_parts_mut(buf as *mut u8, size as usize);
+    let mut position = 0;
+    // Mimic fread call where we return
+    // -1 for error
+    // size for not end of stream/file
+    // 0 or less than size for end of stream/file
+    while position < size as usize {
+        match reader.read(&mut buf[position..]) {
+            Ok(n) if n == 0 => return position,
+            Ok(n) => position += n,
+            // -1
+            Err(_) => return std::usize::MAX,
+        }
+    }
+    position
+}
+
+unsafe extern "C" fn seek_cb<S>(position: u64, user_data: *mut c_void) -> c_int
+where
+    S: Seek,
+{
+    use std::io::SeekFrom;
+    let seeker = &mut *(user_data as *mut S);
+    match seeker.seek(SeekFrom::Start(position)) {
+        Ok(_) => 0,
+        Err(_) => -1,
+    }
+}
+
+impl<R> SeekDecoder<R>
+where
+    R: Read + Seek,
+{
+    /// Creates a new `SeekDecoder`, consuming the `reader`.
+    pub fn new(reader: R) -> Result<SeekDecoder<R>, Error> {
+        // Need to lock reader's memory location before setting callbacks
+        // Need to lock io's memory location before opening decoder
+        let mut inner = Box::new(SeekDecoderInner {
+            reader,
+            mini_ex_io: unsafe { mem::zeroed() },
+            mini_ex_dec: unsafe { mem::zeroed() },
+        });
+
+        inner.mini_ex_io.read = Some(read_cb::<R>);
+        inner.mini_ex_io.read_data = &mut inner.reader as *mut _ as *mut c_void;
+        inner.mini_ex_io.seek = Some(seek_cb::<R>);
+        inner.mini_ex_io.seek_data = &mut inner.reader as *mut _ as *mut c_void;
+
+        let res = unsafe {
+            ffi::mp3dec_ex_open_cb(
+                &mut inner.mini_ex_dec,
+                &mut inner.mini_ex_io,
+                ffi::MP3D_SEEK_TO_SAMPLE as i32,
+            )
+        };
+        from_mini_error(res)?;
+        Ok(SeekDecoder(inner))
+    }
+
+    /// This mp3s sample rate in hertz.
+    pub fn sample_rate(&self) -> i32 {
+        self.0.mini_ex_dec.info.hz
+    }
+    /// The number of channels in this mp3.
+    pub fn channels(&self) -> usize {
+        self.0.mini_ex_dec.info.channels as usize
+    }
+
+    /// Returns the number of samples that were set
+    /// Will be zero at end of stream
+    pub fn read_samples(&mut self, buf: &mut [i16]) -> usize {
+        unsafe {
+            ffi::mp3dec_ex_read(&mut self.0.mini_ex_dec, buf.as_mut_ptr(), buf.len()) as usize
+        }
+    }
+
+    /// Convenience wrapper around `read_samples` to use with a while let loop
+    /// Returns None when out of samples
+    /// Returns the slice of newly assigned samples otherwise
+    pub fn read_sample_slice<'a>(&mut self, buf: &'a mut [i16]) -> Option<&'a mut [i16]> {
+        let len = self.read_samples(buf);
+        if len == 0 {
+            None
+        } else {
+            Some(&mut buf[..len])
+        }
+    }
+
+    /// Seek to the given sample index
+    pub fn seek_samples(&mut self, sample: u64) -> Result<(), Error> {
+        let res = unsafe { ffi::mp3dec_ex_seek(&mut self.0.mini_ex_dec, sample) };
+        from_mini_error(res)
     }
 }

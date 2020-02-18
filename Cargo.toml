@@ -1,6 +1,6 @@
 [package]
 name = "minimp3"
-version = "0.3.3"
+version = "0.4.0"
 authors = ["germän gômez <germangb42@gmail.com>", "Erin Moon <erin@hashbang.sh>"]
 description = "Rust bindings for the minimp3 library."
 keywords = ["mp3", "audio", "decoder", "mpeg", "media"]
@@ -9,6 +9,9 @@ license = "MIT"
 repository = "https://github.com/germangb/minimp3-rs.git"
 
 [dependencies]
-#TODO Update to next release which fixes /tmp file leaks on old linux kernels
+# TODO Update to next release which fixes /tmp file leaks on old linux kernels
 slice-deque = "0.3.0"
-minimp3-sys = { version = "0.3", path = "minimp3-sys" }
+# TODO crates.io version
+# minimp3-sys = { version = "0.4", path = "minimp3-sys" }
+minimp3-sys = {path = "minimp3-sys" }
+libc = "0.2.66"
