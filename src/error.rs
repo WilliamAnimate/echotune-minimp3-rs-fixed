@@ -21,6 +21,8 @@ pub enum Error {
     MiniParam,
     /// Minimp3 had an user error
     MiniUser,
+    /// Minimp3 had an decoder error, likely the sampling rate/channels/layer changed mid stream
+    MiniDecode,
     /// Minimp3 returned an unknown error code
     MiniUnknown,
 }
@@ -52,6 +54,7 @@ impl StdError for Error {
             MiniIo => "Minimp3 io error",
             MiniParam => "Minimp3 parameter error",
             MiniUser => "Minimp3 user error",
+            MiniDecode => "Minimp3 decoder error",
             MiniUnknown => "Unknown error",
         }
     }
@@ -71,6 +74,7 @@ pub(crate) fn from_mini_error(ec: i32) -> Result<(), Error> {
         ffi::MP3D_E_IOERROR => Err(Error::MiniIo),
         ffi::MP3D_E_PARAM => Err(Error::MiniParam),
         ffi::MP3D_E_USER => Err(Error::MiniUser),
+        ffi::MP3D_E_DECODE => Err(Error::MiniDecode),
         _ => Err(Error::MiniUnknown),
     }
 }

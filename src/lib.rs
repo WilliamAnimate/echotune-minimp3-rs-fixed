@@ -230,22 +230,36 @@ where
 
     /// Returns the number of samples that were set
     /// Will be zero at end of stream
-    pub fn read_samples(&mut self, buf: &mut [i16]) -> usize {
-        unsafe {
+    pub fn read_samples(&mut self, buf: &mut [i16]) -> Result<usize, Error> {
+        let len = unsafe {
             ffi::mp3dec_ex_read(&mut self.0.mini_ex_dec, buf.as_mut_ptr(), buf.len()) as usize
+        };
+
+        if len == buf.len() {
+            Ok(len)
+        } else if len < buf.len() {
+            // Check for error occurred
+            from_mini_error(self.0.mini_ex_dec.last_error)?;
+            // Must be end of stream
+            Ok(len)
+        } else {
+            panic!("Minimp3 returned invalid read result. Likely corrupt memory")
         }
     }
 
     /// Convenience wrapper around `read_samples` to use with a while let loop
     /// Returns None when out of samples
     /// Returns the slice of newly assigned samples otherwise
-    pub fn read_sample_slice<'a>(&mut self, buf: &'a mut [i16]) -> Option<&'a mut [i16]> {
-        let len = self.read_samples(buf);
-        if len == 0 {
+    pub fn read_sample_slice<'a>(
+        &mut self,
+        buf: &'a mut [i16],
+    ) -> Result<Option<&'a mut [i16]>, Error> {
+        let len = self.read_samples(buf)?;
+        Ok(if len == 0 {
             None
         } else {
             Some(&mut buf[..len])
-        }
+        })
     }
 
     /// Seek to the given sample index

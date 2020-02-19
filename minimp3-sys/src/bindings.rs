@@ -83,6 +83,7 @@ pub const MP3D_E_PARAM: i32 = -1;
 pub const MP3D_E_MEMORY: i32 = -2;
 pub const MP3D_E_IOERROR: i32 = -3;
 pub const MP3D_E_USER: i32 = -4;
+pub const MP3D_E_DECODE: i32 = -5;
 pub type wchar_t = ::std::os::raw::c_int;
 pub type int_least8_t = ::std::os::raw::c_schar;
 pub type int_least16_t = ::std::os::raw::c_short;
