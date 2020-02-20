@@ -238,7 +238,7 @@ where
         if len == buf.len() {
             Ok(len)
         } else if len < buf.len() {
-            // Check for error occurred
+            // Check for error
             from_mini_error(self.0.mini_ex_dec.last_error)?;
             // Must be end of stream
             Ok(len)
