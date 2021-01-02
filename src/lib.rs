@@ -8,7 +8,6 @@
 //! IO and tokio.
 //!
 //! [See the README for example usages.](https://github.com/germangb/minimp3-rs/tree/async)
-pub use error::Error;
 pub use minimp3_sys as ffi;
 
 use slice_deque::SliceDeque;
