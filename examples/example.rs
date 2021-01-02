@@ -1,5 +1,3 @@
-extern crate minimp3;
-
 use minimp3::{Decoder, Error, Frame};
 
 use std::fs::File;
@@ -10,9 +8,12 @@ fn main() {
 
     loop {
         match decoder.next_frame() {
-            Ok(Frame { data, channels, .. }) => {
-                println!("Decoded {} samples", data.len() / channels)
-            }
+            Ok(Frame {
+                data,
+                sample_rate,
+                channels,
+                ..
+            }) => println!("Decoded {} samples", data.len() / channels),
             Err(Error::Eof) => break,
             Err(e) => panic!("{:?}", e),
         }

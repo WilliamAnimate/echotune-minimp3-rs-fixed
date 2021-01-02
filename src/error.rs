@@ -1,16 +1,20 @@
-use std::error::Error as StdError;
-use std::fmt;
-use std::io;
+use thiserror::Error;
 
 /// Errors encountered by the MP3 decoder.
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum Error {
+    #[error("IO error: {0}")]
     /// An error caused by some IO operation required during decoding.
-    Io(io::Error),
-    /// The decoder tried to parse a frame from its internal buffer, but there was not enough.
+    Io(#[from] std::io::Error),
+    #[error("Insufficient data")]
+    /// The decoder tried to parse a frame from its internal buffer, but there
+    /// was not enough.
     InsufficientData,
-    /// The decoder encountered data which was not a frame (ie, ID3 data), and skipped it.
+    #[error("Skipped data")]
+    /// The decoder encountered data which was not a frame (ie, ID3 data), and
+    /// skipped it.
     SkippedData,
+    #[error("End of reader")]
     /// The decoder has reached the end of the provided reader.
     Eof,
     /// Minimp3 had a memory error, likely allocation
