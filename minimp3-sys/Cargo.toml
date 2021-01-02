@@ -11,4 +11,5 @@ repository = "https://github.com/germangb/minimp3-rs.git"
 exclude = ["minimp3/vectors/*", "minimp3/player/*"]
 
 [build-dependencies]
+bindgen = "0.56"
 cc = "1.0"
