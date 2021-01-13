@@ -258,7 +258,7 @@ pub struct SeekDecoder<R> {
 
 // // Explicitly impl [Send] for [SeekDecoder]s. This isn't a great idea and should
 // // probably be removed in the future. However we need raw pointers
-// unsafe impl<R: Send> Send for Decoder<R> {}
+unsafe impl<R: Send> Send for SeekDecoder<R> {}
 
 impl<R> SeekDecoder<R>
 where
