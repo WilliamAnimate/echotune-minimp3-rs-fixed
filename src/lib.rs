@@ -254,8 +254,11 @@ struct Mp3dec<R> {
 /// Unlike `Decoder` this requires `Seek` + `Read`. Also when possible, depending on the mp3 encoder this will trim of samples that were added as part of the encoding process.
 pub struct SeekDecoder<R> {
     decoder: Box<Mp3dec<R>>,
-    buffer: *mut i16,
 }
+
+// // Explicitly impl [Send] for [SeekDecoder]s. This isn't a great idea and should
+// // probably be removed in the future. However we need raw pointers
+// unsafe impl<R: Send> Send for Decoder<R> {}
 
 impl<R> SeekDecoder<R>
 where
@@ -289,7 +292,6 @@ where
         
         Ok(SeekDecoder {
             decoder: minidec,
-            buffer: std::ptr::null_mut(),
         })
     }
 
@@ -306,7 +308,7 @@ where
         };
 
         let len = frame_info.channels as usize * samples as usize;
-        let buffer = unsafe { Vec::from_raw_parts(self.buffer, len, len)};
+        let buffer = unsafe { Vec::from_raw_parts(buffer, len, len)};
 
         let frame = Frame {
             data: buffer,
