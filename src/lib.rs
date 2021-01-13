@@ -256,8 +256,8 @@ pub struct SeekDecoder<R> {
     decoder: Box<Mp3dec<R>>,
 }
 
-// // Explicitly impl [Send] for [SeekDecoder]s. This isn't a great idea and should
-// // probably be removed in the future. However we need raw pointers
+// Explicitly impl [Send] for [SeekDecoder]. This isn't a great idea and should
+// probably be removed in the future. However we need raw pointers
 unsafe impl<R: Send> Send for SeekDecoder<R> {}
 
 impl<R> SeekDecoder<R>
@@ -307,8 +307,9 @@ where
             )
         };
 
-        let len = frame_info.channels as usize * samples as usize;
-        let buffer = unsafe { Vec::from_raw_parts(buffer, len, len)};
+        let len = samples as usize;
+        let buffer = unsafe { std::slice::from_raw_parts(buffer, len)};
+        let buffer = buffer.to_owned();
 
         let frame = Frame {
             data: buffer,
