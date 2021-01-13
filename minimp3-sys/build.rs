@@ -11,7 +11,9 @@ fn main() {
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate
         // bindings for.
-        .header("minimp3/minimp3.h")
+        // .header("minimp3/minimp3.h")
+        // .header("minimp3/minimp3_ex.h")
+        .header("wrapper.h")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
