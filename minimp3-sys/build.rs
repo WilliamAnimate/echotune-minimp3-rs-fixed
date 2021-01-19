@@ -8,6 +8,9 @@ fn main() {
         .define("MINIMP3_IMPLEMENTATION", None)
         .compile("minimp3");
 
+    // re-enable if bindings have not been created yet
+    // for easy of cross compilation we take this out of build.rs
+    #[cfg(feature="build_bindings")]
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate
         // bindings for.
@@ -23,7 +26,9 @@ fn main() {
         .expect("Unable to generate bindings");
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+
+    #[cfg(feature="build_bindings")]
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");

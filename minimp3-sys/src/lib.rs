@@ -1,3 +1,3 @@
 #![allow(bad_style)]
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+include!(concat!(env!("CARGO_MANIFEST_DIR"), "/bindings.rs"));

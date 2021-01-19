@@ -10,6 +10,9 @@ repository = "https://github.com/germangb/minimp3-rs.git"
 
 exclude = ["minimp3/vectors/*", "minimp3/player/*"]
 
+[features]
+build_bindings = ["bindgen"]
+
 [build-dependencies]
-bindgen = "0.56"
+bindgen = { version = "0.56", optional = true }
 cc = "1.0"
