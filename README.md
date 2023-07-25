@@ -7,7 +7,7 @@ A fixed non depercated version of minimp3 that applies a vital security patch
 # Cargo.toml
 
 [dependencies]
-minimp3_fixed = "0.5.2"
+minimp3_fixed = "0.5.3"
 ```
 
 ```rust
