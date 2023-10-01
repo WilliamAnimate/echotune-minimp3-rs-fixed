@@ -1,5 +1,5 @@
 [package]
-name = "minimp3_fixed"
+name = "minimp3"
 version = "0.5.4"
 authors = ["germän gômez <germangb42@gmail.com>", "Erin Moon <erin@hashbang.sh>", "BOB450"]
 description = "Rust bindings for the minimp3 library. With Security patch applied"

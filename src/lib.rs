@@ -11,9 +11,9 @@
 pub use minimp3_sys as ffi;
 
 // use std::mem;
-// use std::io::{self, Read, Seek};
+use std::io::{Read, Seek};
 // use std::marker::Send;
-// use std::os::raw::{c_int, c_void};
+use std::os::raw::{c_int, c_void};
 
 pub use error::Error;
 use error::from_mini_error;
