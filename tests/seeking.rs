@@ -1,4 +1,4 @@
-use minimp3::{Error, Frame, SeekDecoder};
+use minimp3_fixed::{Error, Frame, SeekDecoder};
 
 use std::fs::File;
 use std::io::{Read, Seek};
