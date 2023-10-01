@@ -1,24 +1,26 @@
 [package]
-name = "minimp3"
-version = "0.5.1"
-authors = ["germän gômez <germangb42@gmail.com>", "Erin Moon <erin@hashbang.sh>"]
-description = "Rust bindings for the minimp3 library."
+name = "minimp3_fixed"
+version = "0.5.4"
+authors = ["germän gômez <germangb42@gmail.com>", "Erin Moon <erin@hashbang.sh>", "BOB450"]
+description = "Rust bindings for the minimp3 library. With Security patch applied"
 keywords = ["mp3", "audio", "decoder", "mpeg", "media"]
 categories = ["multimedia", "multimedia::audio"]
 license = "MIT"
-repository = "https://github.com/germangb/minimp3-rs.git"
-edition = "2018"
+repository = "https://github.com/BOB450/minimp3-rs.git"
+edition = "2021"
 
 [dependencies]
-libc = "0.2.67"
+libc = "0.2.67" # TODO: check if needed <02-10-23, dvdsk noreply@davidsk.dev> 
 slice-deque = "0.3.0"
 minimp3-sys = { version = "0.4", path = "minimp3-sys" }
+slice-ring-buffer = "0.3.2"
 tokio = { version = "1.0", features = ["io-util"], optional = true }
 thiserror = "1.0.23"
 
 [features]
 default = []
 async_tokio = ["tokio"]
+unix_sysv = ["slice-ring-buffer/unix_sysv"]
 
 [dev-dependencies]
 tokio = { version = "1.0", features = ["full"] }

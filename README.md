@@ -1,16 +1,13 @@
 # [minimp3](//github.com/lieff/minimp3) Rust bindings
 
-[![Cargo package](https://img.shields.io/crates/v/minimp3.svg)](https://crates.io/crates/minimp3)
-[![Cargo package](https://img.shields.io/crates/d/minimp3.svg)](https://crates.io/crates/minimp3)
-[![Build Status](https://travis-ci.org/germangb/minimp3-rs.svg?branch=master)](https://travis-ci.org/germangb/minimp3-rs)
-
+A fixed non depercated version of minimp3 that applies a vital security patch
 ## Usage example
 
 ```toml
 # Cargo.toml
 
 [dependencies]
-minimp3 = "0.5"
+minimp3_fixed = "0.5.3"
 ```
 
 ```rust

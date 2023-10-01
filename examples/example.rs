@@ -1,4 +1,4 @@
-use minimp3::{Decoder, Error, Frame};
+use minimp3_fixed::{Decoder, Error, Frame};
 
 use std::fs::File;
 
