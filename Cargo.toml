@@ -11,7 +11,6 @@ edition = "2021"
 
 [dependencies]
 # libc = "0.2.67" # TODO: check if needed <02-10-23, dvdsk noreply@davidsk.dev> 
-slice-deque = "0.3.0"
 minimp3-sys = { version = "0.4", path = "minimp3-sys" }
 slice-ring-buffer = "0.3.2"
 tokio = { version = "1.0", features = ["io-util"], optional = true }
